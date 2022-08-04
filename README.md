@@ -53,6 +53,7 @@ This also builds an executable to test the library:
 Install [emsdk](https://github.com/emscripten-core/emsdk) and run the following commands to build the WebAssembly library:
 
 ```bash
+source /root/emsdk/emsdk_env.sh  # 每启一次shell，使用emcmake之前，都得执行一次
 mkdir build && cd build
 emcmake cmake ..
 emmake make
