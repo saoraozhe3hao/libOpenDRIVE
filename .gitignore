@@ -10,3 +10,5 @@ Viewer/libOpenDrive.*
 Viewer/OpenDrive.*
 Viewer/ModuleOpenDrive.*
 Viewer/*.data
+
+.idea
