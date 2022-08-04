@@ -120,7 +120,7 @@ const roadmarks_material = new THREE.MeshBasicMaterial({
 /* load WASM + odr map */
 libOpenDrive().then(Module => {
     ModuleOpenDrive = Module;
-    fetch("./data.xodr").then((file_data) => {
+    fetch("./xodr/Town01.xodr").then((file_data) => {
         file_data.text().then((file_text) => {
             loadFile(file_text, false);
         });
@@ -137,8 +137,8 @@ function onFileSelect(file)
 function loadFile(file_text, clear_map)
 {
     if (clear_map)
-        ModuleOpenDrive['FS_unlink']('./data.xodr');
-    ModuleOpenDrive['FS_createDataFile'](".", "data.xodr", file_text, true, true);
+        ModuleOpenDrive['FS_unlink']('./data.xodr');  // oasis 内存里维护的文件系统，非本地或网络文件
+    ModuleOpenDrive['FS_createDataFile'](".", "data.xodr", file_text, true, true); // oasis 内存里维护的文件系统，非本地或网络文件
     if (OpenDriveMap)
         OpenDriveMap.delete();
     odr_map_config = {
@@ -148,7 +148,7 @@ function loadFile(file_text, clear_map)
         center_map : true,
         abs_z_for_for_local_road_obj_outline : true
     };
-    OpenDriveMap = new ModuleOpenDrive.OpenDriveMap("./data.xodr", odr_map_config);
+    OpenDriveMap = new ModuleOpenDrive.OpenDriveMap("./data.xodr", odr_map_config); // oasis 内存里维护的文件系统，非本地或网络文件
     loadOdrMap(clear_map);
 }
 
@@ -277,6 +277,11 @@ function loadOdrMap(clear_map = true, fit_view = true)
     disposable_objs.push(roadmark_outlines_geom);
     roadmark_outline_lines.visible = PARAMS.roadmarks;
     scene.add(roadmark_outline_lines);
+
+    /* oasis 地图宽度数值计算 */
+    const bbox_road_network = new THREE.Box3().setFromObject(road_network_mesh);
+    const map_width = bbox_road_network.min.distanceTo(bbox_road_network.max);
+    console.log('地图宽度', map_width);
 
     /* fit view and camera */
     const bbox_reflines = new THREE.Box3().setFromObject(refline_lines);
