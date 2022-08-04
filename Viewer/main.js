@@ -45,12 +45,18 @@ document.getElementById('ThreeJS').appendChild(renderer.domElement);
 
 /* THREEJS globals */
 const scene = new THREE.Scene();
+const axesHelper = new THREE.AxesHelper(50); // oasis x红 y绿 z蓝
+scene.add(axesHelper);  // oasis 加坐标轴
+
 const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 100000);
-camera.up.set(0, 0, 1); /* Coordinate system with Z pointing up */
-const controls = new THREE.MapControls(camera, renderer.domElement);
+// camera.up.set(0, 0, 1); /* Coordinate system with Z pointing up */
+camera.up.set(0, 1, 0);  // oasis 相机姿态
+// const controls = new THREE.MapControls(camera, renderer.domElement);
+const controls = new THREE.OrbitControls(camera, renderer.domElement);  // oasis MapControls是左键平移，OrbitControls是右键平移
 controls.addEventListener('start', () => { spotlight_paused = true; controls.autoRotate = false; });
 controls.addEventListener('end', () => { spotlight_paused = false; });
 controls.autoRotate = true;
+controls.enableRotate = false;  // oasis 禁止旋转
 
 /* THREEJS lights */
 const light = new THREE.DirectionalLight(0xffffff, 1.0);
@@ -276,7 +282,8 @@ function loadOdrMap(clear_map = true, fit_view = true)
     const bbox_reflines = new THREE.Box3().setFromObject(refline_lines);
     const max_diag_dist = bbox_reflines.min.distanceTo(bbox_reflines.max);
     camera.far = max_diag_dist * 1.5;
-    controls.autoRotate = fit_view;
+    // controls.autoRotate = fit_view;
+    controls.autoRotate = false; // oasis 不自动旋转
     if (fit_view)
         fitViewToBbox(bbox_reflines);
 
@@ -442,7 +449,8 @@ function fitViewToBbox(bbox, restrict_zoom = true)
     const fov2r = (camera.fov * 0.5) * (Math.PI / 180.0);
     const dz = l2xy / Math.tan(fov2r);
 
-    camera.position.set(bbox.min.x, center_pt.y, bbox.max.z + dz);
+    // camera.position.set(bbox.min.x, center_pt.y, bbox.max.z + dz);
+    camera.position.set(center_pt.x, center_pt.y, bbox.max.z + dz);  // oasis 相机位置在 地图中心的正上方
     controls.target.set(center_pt.x, center_pt.y, center_pt.z);
     if (restrict_zoom)
         controls.maxDistance = center_pt.distanceTo(bbox.max) * 1.2;
