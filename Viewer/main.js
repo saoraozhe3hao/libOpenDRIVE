@@ -351,6 +351,7 @@ function animate()
         renderer.readRenderTargetPixels(roadmark_picking_texture, 0, 0, 1, 1, roadmark_id_pixel_buffer);
         const xyz_pixel_buffer = new Float32Array(4);
         renderer.readRenderTargetPixels(xyz_texture, 0, 0, 1, 1, xyz_pixel_buffer);
+        /* oasis word坐标的单位是米，OpenDriveMap.x_offs是word坐标系原点与WebGL坐标原点的偏移量*/
         xyz_pixel_buffer[0] += OpenDriveMap.x_offs;
         xyz_pixel_buffer[1] += OpenDriveMap.y_offs;
         const st_pixel_buffer = new Float32Array(4);
@@ -368,6 +369,7 @@ function animate()
                     road_network_mesh.geometry.attributes.color.array.fill(COLORS.road, prev_lane_vert_idx_interval[0] * 3, prev_lane_vert_idx_interval[1] * 3);
                 }
                 INTERSECTED_LANE_ID = decoded_lane_id;
+                /* oasis 车道向量 编号范围 */
                 const lane_vert_idx_interval = odr_lanes_mesh.get_idx_interval_lane(INTERSECTED_LANE_ID);
                 const vert_count = (lane_vert_idx_interval[1] - lane_vert_idx_interval[0]);
                 applyVertexColors(road_network_mesh.geometry.attributes.color, new THREE.Color(COLORS.lane_highlight), lane_vert_idx_interval[0], vert_count);
