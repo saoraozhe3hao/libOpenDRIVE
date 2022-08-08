@@ -191,7 +191,7 @@ function loadOdrMap(clear_map = true, fit_view = true)
     refline_lines.visible = PARAMS.ref_line;
     refline_lines.matrixAutoUpdate = false;
     disposable_objs.push(reflines_geom);
-    scene.add(refline_lines);
+    scene.add(refline_lines);   // oasis 道路中央那条线
 
     /* road network geometry */
     const odr_road_network_mesh = ModuleOpenDrive.get_road_network_mesh(OpenDriveMap, parseFloat(PARAMS.resolution));
@@ -216,6 +216,7 @@ function loadOdrMap(clear_map = true, fit_view = true)
     road_network_mesh.matrixAutoUpdate = false;
     road_network_mesh.visible = !(PARAMS.view_mode == 'Outlines');
     scene.add(road_network_mesh);
+    console.log(new THREE.Box3().setFromObject(road_network_mesh)); // oasis 路网在webgl中的区域尺寸
 
     /* picking road network mesh */
     const lane_picking_mesh = new THREE.Mesh(road_network_geom, id_material);
@@ -251,7 +252,7 @@ function loadOdrMap(clear_map = true, fit_view = true)
     roadmarks_mesh = new THREE.Mesh(roadmarks_geom, roadmarks_material);
     roadmarks_mesh.matrixAutoUpdate = false;
     roadmarks_mesh.visible = !(PARAMS.view_mode == 'Outlines') && PARAMS.roadmarks;
-    scene.add(roadmarks_mesh);
+    // scene.add(roadmarks_mesh);  // oasis 车道线
 
     /* picking roadmarks mesh */
     const roadmark_picking_mesh = new THREE.Mesh(roadmarks_geom, id_material);
@@ -265,7 +266,7 @@ function loadOdrMap(clear_map = true, fit_view = true)
     lane_outline_lines = new THREE.LineSegments(lane_outlines_geom, lane_outlines_material);
     lane_outline_lines.renderOrder = 9;
     disposable_objs.push(lane_outlines_geom);
-    scene.add(lane_outline_lines);
+    // scene.add(lane_outline_lines);  // oasis 车道色块和边框
 
     /* roadmark outline */
     const roadmark_outlines_geom = new THREE.BufferGeometry();
@@ -276,7 +277,7 @@ function loadOdrMap(clear_map = true, fit_view = true)
     roadmark_outline_lines.matrixAutoUpdate = false;
     disposable_objs.push(roadmark_outlines_geom);
     roadmark_outline_lines.visible = PARAMS.roadmarks;
-    scene.add(roadmark_outline_lines);
+    // scene.add(roadmark_outline_lines);  // oasis 车道边框
 
     /* oasis 地图宽度数值计算 */
     const bbox_road_network = new THREE.Box3().setFromObject(road_network_mesh);
@@ -299,7 +300,7 @@ function loadOdrMap(clear_map = true, fit_view = true)
     ground_grid.geometry.rotateX(Math.PI / 2);
     ground_grid.position.set(bbox_center_pt.x, bbox_center_pt.y, bbox_reflines.min.z - 0.1);
     disposable_objs.push(ground_grid.geometry);
-    scene.add(ground_grid);
+    scene.add(ground_grid);  // oasis 背景网格
 
     /* fit light */
     light.position.set(bbox_reflines.min.x, bbox_reflines.min.y, bbox_reflines.max.z + max_diag_dist);
@@ -351,7 +352,7 @@ function animate()
         renderer.readRenderTargetPixels(roadmark_picking_texture, 0, 0, 1, 1, roadmark_id_pixel_buffer);
         const xyz_pixel_buffer = new Float32Array(4);
         renderer.readRenderTargetPixels(xyz_texture, 0, 0, 1, 1, xyz_pixel_buffer);
-        /* oasis word坐标的单位是米，OpenDriveMap.x_offs是word坐标系原点与WebGL坐标原点的偏移量*/
+        /* oasis world坐标的单位是米，OpenDriveMap.x_offs是world坐标系原点与WebGL坐标原点的偏移量*/
         xyz_pixel_buffer[0] += OpenDriveMap.x_offs;
         xyz_pixel_buffer[1] += OpenDriveMap.y_offs;
         const st_pixel_buffer = new Float32Array(4);
