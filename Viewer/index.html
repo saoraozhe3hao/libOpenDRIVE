@@ -82,7 +82,7 @@
         attribute vec2 st;
         varying vec2 vST;
 
-        void main() { 
+        void main() {
             vST = st;
             gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
         }
@@ -90,7 +90,7 @@
 
     <script id="stFragmentShader" type="x-shader/x-vertex">
         varying vec2 vST;
-        
+
         void main() {
             gl_FragColor = vec4(vST.x, vST.y, 0.0, 1.0);
         }

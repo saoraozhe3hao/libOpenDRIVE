@@ -15,14 +15,14 @@ var INTERSECTED_ROADMARK_ID = 0xffffffff;
 var spotlight_paused = false;
 
 const COLORS = {
-    road : 1.0,
-    roadmark : 1.0,
-    lane_outline : 0xae52d4,
-    roadmark_outline : 0xffffff,
-    ref_line : 0x69f0ae,
-    background : 0x444444,
-    lane_highlight : 0x0288d1,
-    roadmark_highlight : 0xff0000,
+    road: 1.0,
+    roadmark: 1.0,
+    lane_outline: 0xae52d4,
+    roadmark_outline: 0xffffff,
+    ref_line: 0x69f0ae,
+    background: 0x444444,
+    lane_highlight: 0x0288d1,
+    roadmark_highlight: 0xff0000,
 };
 
 /* event listeners */
@@ -32,13 +32,13 @@ window.addEventListener('dblclick', onDocumentMouseDbClick, false);
 
 /* notifactions */
 const notyf = new Notyf({
-    duration : 3000,
-    position : { x : 'left', y : 'bottom' },
-    types : [ { type : 'info', background : '#607d8b', icon : false } ]
+    duration: 3000,
+    position: {x: 'left', y: 'bottom'},
+    types: [{type: 'info', background: '#607d8b', icon: false}]
 });
 
 /* THREEJS renderer */
-const renderer = new THREE.WebGLRenderer({ antialias : true, sortObjects : false });
+const renderer = new THREE.WebGLRenderer({antialias: true, sortObjects: false});
 renderer.shadowMap.enabled = true;
 renderer.setSize(window.innerWidth, window.innerHeight);
 document.getElementById('ThreeJS').appendChild(renderer.domElement);
@@ -53,8 +53,13 @@ const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerH
 camera.up.set(0, 1, 0);  // oasis 相机姿态
 // const controls = new THREE.MapControls(camera, renderer.domElement);
 const controls = new THREE.OrbitControls(camera, renderer.domElement);  // oasis MapControls是左键平移，OrbitControls是右键平移
-controls.addEventListener('start', () => { spotlight_paused = true; controls.autoRotate = false; });
-controls.addEventListener('end', () => { spotlight_paused = false; });
+controls.addEventListener('start', () => {
+    spotlight_paused = true;
+    controls.autoRotate = false;
+});
+controls.addEventListener('end', () => {
+    spotlight_paused = false;
+});
 controls.autoRotate = true;
 controls.enableRotate = false;  // oasis 禁止旋转
 
@@ -72,10 +77,10 @@ const xyz_scene = new THREE.Scene();
 xyz_scene.background = new THREE.Color(0xffffff);
 const st_scene = new THREE.Scene();
 st_scene.background = new THREE.Color(0xffffff);
-const lane_picking_texture = new THREE.WebGLRenderTarget(1, 1, { type : THREE.FloatType });
-const roadmark_picking_texture = new THREE.WebGLRenderTarget(1, 1, { type : THREE.FloatType });
-const xyz_texture = new THREE.WebGLRenderTarget(1, 1, { type : THREE.FloatType });
-const st_texture = new THREE.WebGLRenderTarget(1, 1, { type : THREE.FloatType });
+const lane_picking_texture = new THREE.WebGLRenderTarget(1, 1, {type: THREE.FloatType});
+const roadmark_picking_texture = new THREE.WebGLRenderTarget(1, 1, {type: THREE.FloatType});
+const xyz_texture = new THREE.WebGLRenderTarget(1, 1, {type: THREE.FloatType});
+const st_texture = new THREE.WebGLRenderTarget(1, 1, {type: THREE.FloatType});
 
 /* THREEJS materials */
 const idVertexShader = document.getElementById('idVertexShader').textContent;
@@ -86,35 +91,35 @@ const stVertexShader = document.getElementById('stVertexShader').textContent;
 const stFragmentShader = document.getElementById('stFragmentShader').textContent;
 
 const refline_material = new THREE.LineBasicMaterial({
-    color : COLORS.ref_line,
+    color: COLORS.ref_line,
 });
 const road_network_material = new THREE.MeshPhongMaterial({
-    vertexColors : THREE.VertexColors,
-    wireframe : PARAMS.wireframe,
-    shininess : 20.0,
-    transparent : true,
-    opacity : 0.4
+    vertexColors: THREE.VertexColors,
+    wireframe: PARAMS.wireframe,
+    shininess: 20.0,
+    transparent: true,
+    opacity: 0.4
 });
 const lane_outlines_material = new THREE.LineBasicMaterial({
-    color : COLORS.lane_outline,
+    color: COLORS.lane_outline,
 });
 const roadmark_outlines_material = new THREE.LineBasicMaterial({
-    color : COLORS.roadmark_outline,
+    color: COLORS.roadmark_outline,
 });
 const id_material = new THREE.ShaderMaterial({
-    vertexShader : idVertexShader,
-    fragmentShader : idFragmentShader,
+    vertexShader: idVertexShader,
+    fragmentShader: idFragmentShader,
 });
 const xyz_material = new THREE.ShaderMaterial({
-    vertexShader : xyzVertexShader,
-    fragmentShader : xyzFragmentShader,
+    vertexShader: xyzVertexShader,
+    fragmentShader: xyzFragmentShader,
 });
 const st_material = new THREE.ShaderMaterial({
-    vertexShader : stVertexShader,
-    fragmentShader : stFragmentShader,
+    vertexShader: stVertexShader,
+    fragmentShader: stFragmentShader,
 });
 const roadmarks_material = new THREE.MeshBasicMaterial({
-    vertexColors : THREE.VertexColors,
+    vertexColors: THREE.VertexColors,
 });
 
 /* load WASM + odr map */
@@ -127,48 +132,46 @@ libOpenDrive().then(Module => {
     });
 });
 
-function onFileSelect(file)
-{
+function onFileSelect(file) {
     let file_reader = new FileReader();
-    file_reader.onload = () => { loadFile(file_reader.result, true); };
+    file_reader.onload = () => {
+        loadFile(file_reader.result, true);
+    };
     file_reader.readAsText(file);
 }
 
-function loadFile(file_text, clear_map)
-{
+function loadFile(file_text, clear_map) {
     if (clear_map)
         ModuleOpenDrive['FS_unlink']('./data.xodr');  // oasis 内存里维护的文件系统，非本地或网络文件
     ModuleOpenDrive['FS_createDataFile'](".", "data.xodr", file_text, true, true); // oasis 内存里维护的文件系统，非本地或网络文件
     if (OpenDriveMap)
         OpenDriveMap.delete();
     odr_map_config = {
-        with_lateralProfile : PARAMS.lateralProfile,
-        with_laneHeight : PARAMS.laneHeight,
-        with_road_objects : false,
-        center_map : true,
-        abs_z_for_for_local_road_obj_outline : true
+        with_lateralProfile: PARAMS.lateralProfile,
+        with_laneHeight: PARAMS.laneHeight,
+        with_road_objects: false,
+        center_map: true,
+        abs_z_for_for_local_road_obj_outline: true
     };
     OpenDriveMap = new ModuleOpenDrive.OpenDriveMap("./data.xodr", odr_map_config); // oasis 内存里维护的文件系统，非本地或网络文件
     loadOdrMap(clear_map);
 }
 
-function reloadOdrMap()
-{
+function reloadOdrMap() {
     if (OpenDriveMap)
         OpenDriveMap.delete();
     odr_map_config = {
-        with_lateralProfile : PARAMS.lateralProfile,
-        with_laneHeight : PARAMS.laneHeight,
-        with_road_objects : false,
-        center_map : true,
-        abs_z_for_for_local_road_obj_outline : true
+        with_lateralProfile: PARAMS.lateralProfile,
+        with_laneHeight: PARAMS.laneHeight,
+        with_road_objects: false,
+        center_map: true,
+        abs_z_for_for_local_road_obj_outline: true
     };
     OpenDriveMap = new ModuleOpenDrive.OpenDriveMap("./data.xodr", odr_map_config);
     loadOdrMap(true, false);
 }
 
-function loadOdrMap(clear_map = true, fit_view = true)
-{
+function loadOdrMap(clear_map = true, fit_view = true) {
     const t0 = performance.now();
     if (clear_map) {
         road_network_mesh.userData.odr_road_network_mesh.delete();
@@ -191,12 +194,13 @@ function loadOdrMap(clear_map = true, fit_view = true)
     refline_lines.visible = PARAMS.ref_line;
     refline_lines.matrixAutoUpdate = false;
     disposable_objs.push(reflines_geom);
-    scene.add(refline_lines);   // oasis 道路中央那条线
+    // scene.add(refline_lines);   // oasis 道路中央那条线
 
     /* road network geometry */
     const odr_road_network_mesh = ModuleOpenDrive.get_road_network_mesh(OpenDriveMap, parseFloat(PARAMS.resolution));
     const odr_lanes_mesh = odr_road_network_mesh.lanes_mesh;
     const road_network_geom = get_geometry(odr_lanes_mesh);
+    console.log(road_network_geom);
     road_network_geom.attributes.color.array.fill(COLORS.road);
     for (const [vert_start_idx, _] of getStdMapEntries(odr_lanes_mesh.lane_start_indices)) {
         const vert_idx_interval = odr_lanes_mesh.get_idx_interval_lane(vert_start_idx);
@@ -212,7 +216,7 @@ function loadOdrMap(clear_map = true, fit_view = true)
     /* road network mesh */
     road_network_mesh = new THREE.Mesh(road_network_geom, road_network_material);
     road_network_mesh.renderOrder = 0;
-    road_network_mesh.userData = { odr_road_network_mesh };
+    road_network_mesh.userData = {odr_road_network_mesh};
     road_network_mesh.matrixAutoUpdate = false;
     road_network_mesh.visible = !(PARAMS.view_mode == 'Outlines');
     scene.add(road_network_mesh);
@@ -279,13 +283,9 @@ function loadOdrMap(clear_map = true, fit_view = true)
     roadmark_outline_lines.visible = PARAMS.roadmarks;
     // scene.add(roadmark_outline_lines);  // oasis 车道边框
 
-    /* oasis 地图宽度数值计算 */
-    const bbox_road_network = new THREE.Box3().setFromObject(road_network_mesh);
-    const map_width = bbox_road_network.min.distanceTo(bbox_road_network.max);
-    console.log('地图宽度', map_width);
-
     /* fit view and camera */
-    const bbox_reflines = new THREE.Box3().setFromObject(refline_lines);
+    // const bbox_reflines = new THREE.Box3().setFromObject(refline_lines);
+    const bbox_reflines = new THREE.Box3().setFromObject(road_network_mesh); // oasis 以road_network_mesh为全局
     const max_diag_dist = bbox_reflines.min.distanceTo(bbox_reflines.max);
     camera.far = max_diag_dist * 1.5;
     // controls.autoRotate = fit_view;
@@ -301,6 +301,13 @@ function loadOdrMap(clear_map = true, fit_view = true)
     ground_grid.position.set(bbox_center_pt.x, bbox_center_pt.y, bbox_reflines.min.z - 0.1);
     disposable_objs.push(ground_grid.geometry);
     scene.add(ground_grid);  // oasis 背景网格
+
+    /* z=0 平面，辅助 像素拾取 */
+    const geometry = new THREE.PlaneGeometry(max_diag_dist, max_diag_dist);
+    const material = new THREE.MeshBasicMaterial({transparent: true, opacity: 0});
+    const plane = new THREE.Mesh(geometry, material);
+    plane.position.set(bbox_center_pt.x, bbox_center_pt.y, 0);
+    scene.add(plane);
 
     /* fit light */
     light.position.set(bbox_reflines.min.x, bbox_reflines.min.y, bbox_reflines.max.z + max_diag_dist);
@@ -319,7 +326,7 @@ function loadOdrMap(clear_map = true, fit_view = true)
             <tr><th>Num Vertices</th><th>${renderer.info.render.triangles}</th></tr>
         </table>
         </div>`;
-    notyf.open({ type : 'info', message : info_msg });
+    notyf.open({type: 'info', message: info_msg});
 
     odr_roadmarks_mesh.delete();
     odr_lanes_mesh.delete();
@@ -327,9 +334,8 @@ function loadOdrMap(clear_map = true, fit_view = true)
     animate();
 }
 
-function animate()
-{
-    setTimeout(function() {
+function animate() {
+    setTimeout(function () {
         requestAnimationFrame(animate);
     }, 1000 / 30);
 
@@ -436,8 +442,36 @@ function animate()
     renderer.render(scene, camera);
 }
 
-function get_geometry(odr_meshunion)
-{
+/* oasis webgl坐标转画布坐标，注意传入的是webgl坐标，而非OpenDRIVE的world坐标 */
+function webgl2screen(webglVector) {
+    const centerX = window.innerWidth / 2;
+    const centerY = window.innerHeight / 2;
+    const standardVector = webglVector.project(camera);
+
+    const screenX = Math.round(centerX * standardVector.x + centerX);
+    const screenY = Math.round(-centerY * standardVector.y + centerY);
+
+    return new THREE.Vector2(screenX, screenY);
+}
+
+/* oasis 画布坐标转webgl坐标，即画布点射线与z=0平面的交点 */
+function screen2webgl(screenVector) {
+    const pointer = new THREE.Vector2();  // 标准设备坐标
+    pointer.x = (screenVector.x / window.innerWidth) * 2 - 1;
+    pointer.y = -(screenVector.y / window.innerHeight) * 2 + 1;
+
+    const raycaster = new THREE.Raycaster();  // 射线
+    raycaster.setFromCamera(pointer, camera);
+
+    const intersects = raycaster.intersectObjects(scene.children);  // 找出与射线交汇的物体
+    for (let i = 0; i < intersects.length; i++) {
+        if(intersects[i].object.geometry.type == 'PlaneGeometry'){
+            return intersects[i].point;
+        }
+    }
+}
+
+function get_geometry(odr_meshunion) {
     const geom = new THREE.BufferGeometry();
     geom.setAttribute('position', new THREE.Float32BufferAttribute(getStdVecEntries(odr_meshunion.vertices, true).flat(), 3));
     geom.setAttribute('st', new THREE.Float32BufferAttribute(getStdVecEntries(odr_meshunion.st_coordinates, true).flat(), 2));
@@ -448,8 +482,7 @@ function get_geometry(odr_meshunion)
     return geom;
 }
 
-function fitViewToBbox(bbox, restrict_zoom = true)
-{
+function fitViewToBbox(bbox, restrict_zoom = true) {
     let center_pt = new THREE.Vector3();
     bbox.getCenter(center_pt);
 
@@ -465,14 +498,12 @@ function fitViewToBbox(bbox, restrict_zoom = true)
     controls.update();
 }
 
-function fitViewToObj(obj)
-{
+function fitViewToObj(obj) {
     const bbox = new THREE.Box3().setFromObject(obj);
     fitViewToBbox(bbox);
 }
 
-function applyVertexColors(buffer_attribute, color, offset, count)
-{
+function applyVertexColors(buffer_attribute, color, offset, count) {
     const colors = new Float32Array(count * buffer_attribute.itemSize);
     for (let i = 0; i < (count * buffer_attribute.itemSize); i += buffer_attribute.itemSize) {
         colors[i] = color.r;
@@ -482,8 +513,7 @@ function applyVertexColors(buffer_attribute, color, offset, count)
     buffer_attribute.array.set(colors, offset * buffer_attribute.itemSize);
 }
 
-function getStdMapKeys(std_map, delete_map = false)
-{
+function getStdMapKeys(std_map, delete_map = false) {
     let map_keys = [];
     const map_keys_vec = std_map.keys();
     for (let idx = 0; idx < map_keys_vec.size(); idx++)
@@ -494,16 +524,14 @@ function getStdMapKeys(std_map, delete_map = false)
     return map_keys;
 }
 
-function getStdMapEntries(std_map)
-{
+function getStdMapEntries(std_map) {
     let map_entries = [];
     for (let key of getStdMapKeys(std_map))
-        map_entries.push([ key, std_map.get(key) ]);
+        map_entries.push([key, std_map.get(key)]);
     return map_entries;
 }
 
-function getStdVecEntries(std_vec, delete_vec = false, ArrayType = null)
-{
+function getStdVecEntries(std_vec, delete_vec = false, ArrayType = null) {
     let entries = ArrayType ? new ArrayType(std_vec.size()) : new Array(std_vec.size());
     for (let idx = 0; idx < std_vec.size(); idx++)
         entries[idx] = std_vec.get(idx);
@@ -512,13 +540,11 @@ function getStdVecEntries(std_vec, delete_vec = false, ArrayType = null)
     return entries;
 }
 
-function isValid(rgba)
-{
+function isValid(rgba) {
     return !(rgba[0] == 1 && rgba[1] == 1 && rgba[2] == 1 && rgba[3] == 1);
 }
 
-function encodeUInt32(ui32)
-{
+function encodeUInt32(ui32) {
     rgba = new Float32Array(4);
     rgba[0] = (Math.trunc(ui32) % 256) / 255.;
     rgba[1] = (Math.trunc(ui32 / 256) % 256) / 255.;
@@ -527,27 +553,26 @@ function encodeUInt32(ui32)
     return rgba;
 }
 
-function decodeUInt32(rgba)
-{
+function decodeUInt32(rgba) {
     return Math.round(rgba[0] * 255) + Math.round(rgba[1] * 255) * 256 + Math.round(rgba[2] * 255) * 256 * 256 + Math.round(rgba[3] * 255) * 256 * 256 * 256;
 }
 
-function onWindowResize()
-{
+function onWindowResize() {
     camera.aspect = window.innerWidth / window.innerHeight;
     camera.updateProjectionMatrix();
     renderer.setSize(window.innerWidth, window.innerHeight);
 }
 
-function onDocumentMouseMove(event)
-{
+function onDocumentMouseMove(event) {
     event.preventDefault();
     mouse.x = event.clientX;
     mouse.y = event.clientY;
+
+    const webglXYZ = screen2webgl(new THREE.Vector2(mouse.x, mouse.y));
+    webglXYZ && console.log(webglXYZ);
 }
 
-function onDocumentMouseDbClick(e)
-{
+function onDocumentMouseDbClick(e) {
     if (INTERSECTED_LANE_ID != 0xffffffff) {
         const odr_lanes_mesh = road_network_mesh.userData.odr_road_network_mesh.lanes_mesh;
         const lane_vert_idx_interval = odr_lanes_mesh.get_idx_interval_lane(INTERSECTED_LANE_ID);
@@ -555,7 +580,7 @@ function onDocumentMouseDbClick(e)
         const vertB = odr_lanes_mesh.vertices.get(lane_vert_idx_interval[1] - 1);
         odr_lanes_mesh.delete();
         const bbox = new THREE.Box3();
-        bbox.setFromArray([ vertA, vertB ].flat());
+        bbox.setFromArray([vertA, vertB].flat());
         fitViewToBbox(bbox, false);
     }
 }
