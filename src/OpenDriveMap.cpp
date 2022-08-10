@@ -547,6 +547,10 @@ OpenDriveMap::OpenDriveMap(const std::string& xodr_file, const OpenDriveMapConfi
 
 std::vector<Road> OpenDriveMap::get_roads() const { return get_map_values(this->id_to_road); }
 
+Vec3D OpenDriveMap::get_xyz(std::string road_id, double s, double t, double h) const {
+    return this->id_to_road.at(road_id).get_xyz(s, t, h);
+}
+
 std::vector<Junction> OpenDriveMap::get_junctions() const { return get_map_values(this->id_to_junction); }
 
 RoutingGraph OpenDriveMap::get_routing_graph() const

@@ -567,9 +567,6 @@ function onDocumentMouseMove(event) {
     event.preventDefault();
     mouse.x = event.clientX;
     mouse.y = event.clientY;
-
-    const webglXYZ = screen2webgl(new THREE.Vector2(mouse.x, mouse.y));
-    webglXYZ && console.log(webglXYZ);
 }
 
 function onDocumentMouseDbClick(e) {

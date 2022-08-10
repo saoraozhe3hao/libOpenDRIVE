@@ -28,6 +28,7 @@ public:
 
     std::vector<Road>     get_roads() const;
     std::vector<Junction> get_junctions() const;
+    Vec3D     get_xyz(std::string road_id, double s, double t, double h) const;
 
     RoutingGraph get_routing_graph() const;
 

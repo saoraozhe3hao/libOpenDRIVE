@@ -91,6 +91,10 @@ EMSCRIPTEN_BINDINGS(OpenDriveMap)
 
     emscripten::class_<OpenDriveMap>("OpenDriveMap")
         .constructor<std::string, OpenDriveMapConfig>()
+        // 属性类型和方法的返回类型，只能是一般数据类型，string/vector<一般类型>
+//        .function("get_roads", &OpenDriveMap::get_roads)
+//        .property("id_to_road", &OpenDriveMap::id_to_road)
+        .function("get_xyz", &OpenDriveMap::get_xyz)
         .property("xodr_file", &OpenDriveMap::xodr_file)
         .property("x_offs", &OpenDriveMap::x_offs)
         .property("y_offs", &OpenDriveMap::y_offs);
