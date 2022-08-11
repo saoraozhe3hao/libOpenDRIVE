@@ -194,7 +194,7 @@ function loadOdrMap(clear_map = true, fit_view = true) {
     refline_lines.visible = PARAMS.ref_line;
     refline_lines.matrixAutoUpdate = false;
     disposable_objs.push(reflines_geom);
-    // scene.add(refline_lines);   // oasis 道路中央那条线
+    scene.add(refline_lines);   // oasis 道路中央那条线
 
     /* road network geometry */
     const odr_road_network_mesh = ModuleOpenDrive.get_road_network_mesh(OpenDriveMap, parseFloat(PARAMS.resolution));
@@ -256,7 +256,7 @@ function loadOdrMap(clear_map = true, fit_view = true) {
     roadmarks_mesh = new THREE.Mesh(roadmarks_geom, roadmarks_material);
     roadmarks_mesh.matrixAutoUpdate = false;
     roadmarks_mesh.visible = !(PARAMS.view_mode == 'Outlines') && PARAMS.roadmarks;
-    // scene.add(roadmarks_mesh);  // oasis 车道线
+    scene.add(roadmarks_mesh);  // oasis 车道线
 
     /* picking roadmarks mesh */
     const roadmark_picking_mesh = new THREE.Mesh(roadmarks_geom, id_material);
@@ -428,6 +428,9 @@ function animate() {
             const lanesec_s0 = odr_lanes_mesh.get_lanesec_s0(INTERSECTED_LANE_ID);
             const lane_id = odr_lanes_mesh.get_lane_id(INTERSECTED_LANE_ID);
             odr_lanes_mesh.delete();
+            const offset = OpenDriveMap.get_lane_offset(road_id, st_pixel_buffer[0], st_pixel_buffer[1]);
+            const t = OpenDriveMap.get_road_t(road_id, st_pixel_buffer[0], lane_id, offset);
+            console.log(offset, t);
             spotlight_info.innerHTML = `
                     <table>
                         <tr><th>road id</th><th>${road_id}</th></tr>
@@ -465,7 +468,7 @@ function screen2webgl(screenVector) {
 
     const intersects = raycaster.intersectObjects(scene.children);  // 找出与射线交汇的物体
     for (let i = 0; i < intersects.length; i++) {
-        if(intersects[i].object.geometry.type == 'PlaneGeometry'){
+        if (intersects[i].object.geometry.type == 'PlaneGeometry') {
             return intersects[i].point;
         }
     }
