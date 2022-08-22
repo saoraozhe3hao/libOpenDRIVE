@@ -31,11 +31,18 @@ window.addEventListener('mousemove', onDocumentMouseMove, false);
 window.addEventListener('dblclick', onDocumentMouseDbClick, false);
 
 /* notifactions */
+// const notyf = new Notyf({
+//     duration : 3000,
+//     position : { x : 'left', y : 'bottom' },
+//     types : [ { type : 'info', background : '#607d8b', icon : false } ]
+// });
+/* 加载提示 */
 const notyf = new Notyf({
-    duration: 3000,
-    position: {x: 'left', y: 'bottom'},
-    types: [{type: 'info', background: '#607d8b', icon: false}]
+    duration: 0,
+    position: {x: 'center', y: 'center'}
 });
+const info_msg = `<h4>加载中...</h4>`;
+notyf.open({type: 'info', message: info_msg});
 
 /* THREEJS renderer */
 const renderer = new THREE.WebGLRenderer({antialias: true, sortObjects: false});
@@ -45,14 +52,9 @@ document.getElementById('ThreeJS').appendChild(renderer.domElement);
 
 /* THREEJS globals */
 const scene = new THREE.Scene();
-const axesHelper = new THREE.AxesHelper(50); // oasis x红 y绿 z蓝
-scene.add(axesHelper);  // oasis 加坐标轴
-
 const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 100000);
-// camera.up.set(0, 0, 1); /* Coordinate system with Z pointing up */
-camera.up.set(0, 1, 0);  // oasis 相机姿态
-// const controls = new THREE.MapControls(camera, renderer.domElement);
-const controls = new THREE.OrbitControls(camera, renderer.domElement);  // oasis MapControls是左键平移，OrbitControls是右键平移
+camera.up.set(0, 0, 1); /* Coordinate system with Z pointing up */
+const controls = new THREE.MapControls(camera, renderer.domElement);
 controls.addEventListener('start', () => {
     spotlight_paused = true;
     controls.autoRotate = false;
@@ -61,7 +63,6 @@ controls.addEventListener('end', () => {
     spotlight_paused = false;
 });
 controls.autoRotate = true;
-controls.enableRotate = false;  // oasis 禁止旋转
 
 /* THREEJS lights */
 const light = new THREE.DirectionalLight(0xffffff, 1.0);
@@ -125,6 +126,7 @@ const roadmarks_material = new THREE.MeshBasicMaterial({
 /* load WASM + odr map */
 libOpenDrive().then(Module => {
     ModuleOpenDrive = Module;
+    let map = location.href.split("=")[1];
     fetch("https://guard-strike.oss-cn-shanghai.aliyuncs.com/oasis/xodr/Town03.xodr").then((file_data) => {
         file_data.text().then((file_text) => {
             loadFile(file_text, false);
@@ -142,22 +144,8 @@ function onFileSelect(file) {
 
 function loadFile(file_text, clear_map) {
     if (clear_map)
-        ModuleOpenDrive['FS_unlink']('./data.xodr');  // oasis 内存里维护的文件系统，非本地或网络文件
-    ModuleOpenDrive['FS_createDataFile'](".", "data.xodr", file_text, true, true); // oasis 内存里维护的文件系统，非本地或网络文件
-    if (OpenDriveMap)
-        OpenDriveMap.delete();
-    odr_map_config = {
-        with_lateralProfile: PARAMS.lateralProfile,
-        with_laneHeight: PARAMS.laneHeight,
-        with_road_objects: false,
-        center_map: true,
-        abs_z_for_for_local_road_obj_outline: true
-    };
-    OpenDriveMap = new ModuleOpenDrive.OpenDriveMap("./data.xodr", odr_map_config); // oasis 内存里维护的文件系统，非本地或网络文件
-    loadOdrMap(clear_map);
-}
-
-function reloadOdrMap() {
+        ModuleOpenDrive['FS_unlink']('./data.xodr');
+    ModuleOpenDrive['FS_createDataFile'](".", "data.xodr", file_text, true, true);
     if (OpenDriveMap)
         OpenDriveMap.delete();
     odr_map_config = {
@@ -168,6 +156,13 @@ function reloadOdrMap() {
         abs_z_for_for_local_road_obj_outline: true
     };
     OpenDriveMap = new ModuleOpenDrive.OpenDriveMap("./data.xodr", odr_map_config);
+    loadOdrMap(clear_map);
+}
+
+function reloadOdrMap() {
+    if (OpenDriveMap)
+        OpenDriveMap.delete();
+    OpenDriveMap = new ModuleOpenDrive.OpenDriveMap("./data.xodr", PARAMS.lateralProfile, PARAMS.laneHeight, true, false);
     loadOdrMap(true, false);
 }
 
@@ -200,7 +195,6 @@ function loadOdrMap(clear_map = true, fit_view = true) {
     const odr_road_network_mesh = ModuleOpenDrive.get_road_network_mesh(OpenDriveMap, parseFloat(PARAMS.resolution));
     const odr_lanes_mesh = odr_road_network_mesh.lanes_mesh;
     const road_network_geom = get_geometry(odr_lanes_mesh);
-    console.log(road_network_geom);
     road_network_geom.attributes.color.array.fill(COLORS.road);
     for (const [vert_start_idx, _] of getStdMapEntries(odr_lanes_mesh.lane_start_indices)) {
         const vert_idx_interval = odr_lanes_mesh.get_idx_interval_lane(vert_start_idx);
@@ -220,7 +214,6 @@ function loadOdrMap(clear_map = true, fit_view = true) {
     road_network_mesh.matrixAutoUpdate = false;
     road_network_mesh.visible = !(PARAMS.view_mode == 'Outlines');
     scene.add(road_network_mesh);
-    console.log(new THREE.Box3().setFromObject(road_network_mesh)); // oasis 路网在webgl中的区域尺寸
 
     /* picking road network mesh */
     const lane_picking_mesh = new THREE.Mesh(road_network_geom, id_material);
@@ -270,7 +263,7 @@ function loadOdrMap(clear_map = true, fit_view = true) {
     lane_outline_lines = new THREE.LineSegments(lane_outlines_geom, lane_outlines_material);
     lane_outline_lines.renderOrder = 9;
     disposable_objs.push(lane_outlines_geom);
-    // scene.add(lane_outline_lines);  // oasis 车道色块和边框
+    scene.add(lane_outline_lines);
 
     /* roadmark outline */
     const roadmark_outlines_geom = new THREE.BufferGeometry();
@@ -281,10 +274,10 @@ function loadOdrMap(clear_map = true, fit_view = true) {
     roadmark_outline_lines.matrixAutoUpdate = false;
     disposable_objs.push(roadmark_outlines_geom);
     roadmark_outline_lines.visible = PARAMS.roadmarks;
-    // scene.add(roadmark_outline_lines);  // oasis 车道边框
+    scene.add(roadmark_outline_lines);
 
     /* fit view and camera */
-    const bbox_reflines = new THREE.Box3().setFromObject(refline_lines); // oasis 不能传road_network_mesh，否则Town03地图会出错
+    const bbox_reflines = new THREE.Box3().setFromObject(refline_lines);
     const max_diag_dist = bbox_reflines.min.distanceTo(bbox_reflines.max);
     camera.far = max_diag_dist * 1.5;
     // controls.autoRotate = fit_view;
@@ -299,14 +292,7 @@ function loadOdrMap(clear_map = true, fit_view = true) {
     ground_grid.geometry.rotateX(Math.PI / 2);
     ground_grid.position.set(bbox_center_pt.x, bbox_center_pt.y, bbox_reflines.min.z - 0.1);
     disposable_objs.push(ground_grid.geometry);
-    scene.add(ground_grid);  // oasis 背景网格
-
-    /* z=0 平面，辅助 像素拾取 */
-    const geometry = new THREE.PlaneGeometry(max_diag_dist, max_diag_dist);
-    const material = new THREE.MeshBasicMaterial({transparent: true, opacity: 0});
-    const plane = new THREE.Mesh(geometry, material);
-    plane.position.set(bbox_center_pt.x, bbox_center_pt.y, 0);
-    scene.add(plane);
+    scene.add(ground_grid);
 
     /* fit light */
     light.position.set(bbox_reflines.min.x, bbox_reflines.min.y, bbox_reflines.max.z + max_diag_dist);
@@ -317,15 +303,18 @@ function loadOdrMap(clear_map = true, fit_view = true) {
 
     const t1 = performance.now();
     console.log("Heap size: " + ModuleOpenDrive.HEAP8.length / 1024 / 1024 + " mb");
-    const info_msg = `
-        <div class=popup_info>
-        <h3>Finished loading</h3>
-        <table>
-            <tr><th>Time</th><th>${((t1 - t0) / 1e3).toFixed(2)}s</th></tr>
-            <tr><th>Num Vertices</th><th>${renderer.info.render.triangles}</th></tr>
-        </table>
-        </div>`;
-    notyf.open({type: 'info', message: info_msg});
+    /* 加载完成提示 */
+    // const info_msg = `
+    //     <div class=popup_info>
+    //     <h3>Finished loading</h3>
+    //     <table>
+    //         <tr><th>Time</th><th>${((t1 - t0) / 1e3).toFixed(2)}s</th></tr>
+    //         <tr><th>Num Roads</th><th>${OpenDriveMap.roads.size()}</th></tr>
+    //         <tr><th>Num Vertices</th><th>${renderer.info.render.triangles}</th></tr>
+    //     </table>
+    //     </div>`;
+    // notyf.open({ type : 'info', message : info_msg });
+    notyf.dismissAll();  /* 隐藏加载提示 */
 
     odr_roadmarks_mesh.delete();
     odr_lanes_mesh.delete();
@@ -380,7 +369,7 @@ function animate() {
                 const vert_count = (lane_vert_idx_interval[1] - lane_vert_idx_interval[0]);
                 applyVertexColors(road_network_mesh.geometry.attributes.color, new THREE.Color(COLORS.lane_highlight), lane_vert_idx_interval[0], vert_count);
                 road_network_mesh.geometry.attributes.color.needsUpdate = true;
-                spotlight_info.style.display = "block";
+                // spotlight_info.style.display = "block";  隐藏左上角信息
             }
             odr_lanes_mesh.delete();
         } else {
@@ -426,15 +415,13 @@ function animate() {
             const road_id = odr_lanes_mesh.get_road_id(INTERSECTED_LANE_ID);
             const lanesec_s0 = odr_lanes_mesh.get_lanesec_s0(INTERSECTED_LANE_ID);
             const lane_id = odr_lanes_mesh.get_lane_id(INTERSECTED_LANE_ID);
+            const lane_type = OpenDriveMap.roads.get(road_id).s_to_lanesection.get(lanesec_s0).id_to_lane.get(lane_id).type;
             odr_lanes_mesh.delete();
-            const offset = OpenDriveMap.get_lane_offset(road_id, st_pixel_buffer[0], st_pixel_buffer[1]);
-            const t = OpenDriveMap.get_road_t(road_id, st_pixel_buffer[0], lane_id, offset);
-            console.log(offset, t);
             spotlight_info.innerHTML = `
                     <table>
                         <tr><th>road id</th><th>${road_id}</th></tr>
                         <tr><th>section s0</th><th>${lanesec_s0.toFixed(2)}</th></tr>
-                        <tr><th>lane</th><th>${lane_id}</th></tr>
+                        <tr><th>lane</th><th>${lane_id} <span style="color:gray;">${lane_type}</span></th></tr>
                         <tr><th>s/t</th><th>[${st_pixel_buffer[0].toFixed(2)}, ${st_pixel_buffer[1].toFixed(2)}]</th>
                         <tr><th>world</th><th>[${xyz_pixel_buffer[0].toFixed(2)}, ${xyz_pixel_buffer[1].toFixed(2)}, ${xyz_pixel_buffer[2].toFixed(2)}]</th></tr>
                     </table>`;
@@ -492,8 +479,7 @@ function fitViewToBbox(bbox, restrict_zoom = true) {
     const fov2r = (camera.fov * 0.5) * (Math.PI / 180.0);
     const dz = l2xy / Math.tan(fov2r);
 
-    // camera.position.set(bbox.min.x, center_pt.y, bbox.max.z + dz);
-    camera.position.set(center_pt.x, center_pt.y, bbox.max.z + dz);  // oasis 相机位置在 地图中心的正上方
+    camera.position.set(bbox.min.x, center_pt.y, bbox.max.z + dz);
     controls.target.set(center_pt.x, center_pt.y, center_pt.z);
     if (restrict_zoom)
         controls.maxDistance = center_pt.distanceTo(bbox.max) * 1.2;
