@@ -33,6 +33,7 @@ public:
     int    get_lane_id(std::string road_id, double s, double t) const;
     double get_lane_offset(std::string road_id, double s, double t) const;
     double get_road_t(std::string road_id, double s, int lane_id, double offset) const;
+    double get_road_length(std::string road_id) const;
 
     RoutingGraph get_routing_graph() const;
 

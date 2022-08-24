@@ -593,6 +593,9 @@ double OpenDriveMap::get_road_t(std::string road_id, double s, int lane_id, doub
     return t;
 }
 
+double OpenDriveMap::get_road_length(std::string road_id) const {
+    return this->id_to_road.at(road_id).length;
+}
 
 std::vector<Junction> OpenDriveMap::get_junctions() const { return get_map_values(this->id_to_junction); }
 

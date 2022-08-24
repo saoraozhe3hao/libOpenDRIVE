@@ -99,6 +99,7 @@ EMSCRIPTEN_BINDINGS(OpenDriveMap)
         .function("get_lane_id", &OpenDriveMap::get_lane_id)
         .function("get_lane_offset", &OpenDriveMap::get_lane_offset)
         .function("get_road_t", &OpenDriveMap::get_road_t)
+        .function("get_road_length", &OpenDriveMap::get_road_length)
         .property("xodr_file", &OpenDriveMap::xodr_file)
         .property("x_offs", &OpenDriveMap::x_offs)
         .property("y_offs", &OpenDriveMap::y_offs);

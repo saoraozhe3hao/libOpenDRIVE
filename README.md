@@ -54,6 +54,7 @@ Install [emsdk](https://github.com/emscripten-core/emsdk) and run the following 
 
 ```bash
 source /root/emsdk/emsdk_env.sh  # 每启一次shell，使用emcmake之前，都得执行一次
+rm -rf build
 mkdir build && cd build
 emcmake cmake ..
 emmake make
@@ -70,3 +71,7 @@ Refer to the code in [main.js](Viewer/main.js) for an example.
 ```js
 odr_map = new Module.OpenDriveMap("./data.xodr", odr_map_config);
 ```
+
+
+### 二次开发
+在 Embind.cpp 配置需要暴露的方法和属性
