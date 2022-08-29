@@ -32,6 +32,7 @@ public:
     double get_section_s0(std::string road_id, double s) const;
     int    get_lane_id(std::string road_id, double s, double t) const;
     double get_lane_offset(std::string road_id, double s, double t) const;
+    std::string get_lane_type(std::string road_id, double s, int lane_id) const;
     double get_road_t(std::string road_id, double s, int lane_id, double offset) const;
     double get_road_length(std::string road_id) const;
 

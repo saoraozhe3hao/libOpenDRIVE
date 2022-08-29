@@ -576,6 +576,10 @@ double OpenDriveMap::get_lane_offset(std::string road_id, double s, double t) co
     return offset;
 }
 
+std::string OpenDriveMap::get_lane_type(std::string road_id, double s, int lane_id) const {
+    return this->id_to_road.at(road_id).get_lanesection(s).id_to_lane.at(lane_id).type;
+}
+
 double OpenDriveMap::get_road_t(std::string road_id, double s, int lane_id, double offset) const {
     LaneSection section = this->id_to_road.at(road_id).get_lanesection(s);
     Lane lane = section.id_to_lane.at(lane_id);
