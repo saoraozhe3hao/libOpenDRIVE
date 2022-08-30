@@ -580,6 +580,11 @@ std::string OpenDriveMap::get_lane_type(std::string road_id, double s, int lane_
     return this->id_to_road.at(road_id).get_lanesection(s).id_to_lane.at(lane_id).type;
 }
 
+bool OpenDriveMap::has_lane_id(std::string road_id, double s, int lane_id) const {
+    std::map<int, Lane> id_to_lane = this->id_to_road.at(road_id).get_lanesection(s).id_to_lane;
+    return id_to_lane.find(lane_id) != id_to_lane.end();
+}
+
 double OpenDriveMap::get_road_t(std::string road_id, double s, int lane_id, double offset) const {
     LaneSection section = this->id_to_road.at(road_id).get_lanesection(s);
     Lane lane = section.id_to_lane.at(lane_id);
@@ -599,6 +604,10 @@ double OpenDriveMap::get_road_t(std::string road_id, double s, int lane_id, doub
 
 double OpenDriveMap::get_road_length(std::string road_id) const {
     return this->id_to_road.at(road_id).length;
+}
+
+bool OpenDriveMap::has_road_id(std::string road_id) const {
+    return this->id_to_road.find(road_id) != this->id_to_road.end();
 }
 
 std::vector<Junction> OpenDriveMap::get_junctions() const { return get_map_values(this->id_to_junction); }

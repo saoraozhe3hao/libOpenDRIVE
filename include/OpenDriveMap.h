@@ -30,11 +30,15 @@ public:
     std::vector<Junction> get_junctions() const;
     Vec3D  get_xyz(std::string road_id, double s, double t, double h) const;
     double get_section_s0(std::string road_id, double s) const;
+
     int    get_lane_id(std::string road_id, double s, double t) const;
     double get_lane_offset(std::string road_id, double s, double t) const;
     std::string get_lane_type(std::string road_id, double s, int lane_id) const;
+    bool has_lane_id(std::string road_id, double s, int lane_id) const;
+
     double get_road_t(std::string road_id, double s, int lane_id, double offset) const;
     double get_road_length(std::string road_id) const;
+    bool has_road_id(std::string road_id) const;
 
     RoutingGraph get_routing_graph() const;
 
