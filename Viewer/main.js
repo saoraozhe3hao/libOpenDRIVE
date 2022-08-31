@@ -194,7 +194,7 @@ function loadOdrMap(clear_map = true, fit_view = true) {
     refline_lines.visible = PARAMS.ref_line;
     refline_lines.matrixAutoUpdate = false;
     disposable_objs.push(reflines_geom);
-    scene.add(refline_lines);   // oasis 道路中央那条线
+    scene.add(refline_lines);   // oasis 道路中的绿线，即s/t坐标的参考线
 
     /* road network geometry */
     const odr_road_network_mesh = ModuleOpenDrive.get_road_network_mesh(OpenDriveMap, parseFloat(PARAMS.resolution));

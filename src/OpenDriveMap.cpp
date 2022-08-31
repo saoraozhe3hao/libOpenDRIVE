@@ -560,9 +560,11 @@ int OpenDriveMap::get_lane_id(std::string road_id, double s, double t) const {
 }
 
 double OpenDriveMap::get_lane_offset(std::string road_id, double s, double t) const {
-    LaneSection section = this->id_to_road.at(road_id).get_lanesection(s);
+    Road road = this->id_to_road.at(road_id);
+    LaneSection section = road.get_lanesection(s);
     Lane lane = section.get_lane(s, t);
-    int side = t > 0 ? 1 : -1; // 沿着S轴，左侧为正，右侧为负
+    double distance = t - road.lane_offset.get(s);  // 离道路中心线的距离=t-lane_offset，t的参考线与道路中心线的距离即lane_offset
+    int side = distance > 0 ? 1 : -1; // 沿着S轴，左侧为正，右侧为负
     double pre_lane_width = 0;    // 内侧几条车道的宽度
 
     for(int i=1;i<lane.id*side;i++){
@@ -572,7 +574,7 @@ double OpenDriveMap::get_lane_offset(std::string road_id, double s, double t) co
         }
     }
     double lane_width = lane.lane_width.get(s);
-    double offset = (t*side - pre_lane_width - lane_width/2)*side;  // 沿着S轴，左侧为正，右侧为负
+    double offset = (distance*side - pre_lane_width - lane_width/2)*side;  // 沿着S轴，左侧为正，右侧为负
     return offset;
 }
 
@@ -586,7 +588,8 @@ bool OpenDriveMap::has_lane_id(std::string road_id, double s, int lane_id) const
 }
 
 double OpenDriveMap::get_road_t(std::string road_id, double s, int lane_id, double offset) const {
-    LaneSection section = this->id_to_road.at(road_id).get_lanesection(s);
+    Road road = this->id_to_road.at(road_id);
+    LaneSection section = road.get_lanesection(s);
     Lane lane = section.id_to_lane.at(lane_id);
     int side = lane_id > 0 ? 1 : -1; // 沿着S轴，左侧为正，右侧为负
     double pre_lane_width = 0;    // 内侧几条车道的宽度
@@ -598,8 +601,8 @@ double OpenDriveMap::get_road_t(std::string road_id, double s, int lane_id, doub
         }
     }
     double lane_width = lane.lane_width.get(s);
-    double t = (pre_lane_width + lane_width/2 + offset*side)*side;  // 沿着S轴，左侧为正，右侧为负
-    return t;
+    double distance = (pre_lane_width + lane_width/2 + offset*side)*side;  // 离道路中心线的距离，沿着S轴，左侧为正，右侧为负
+    return distance + road.lane_offset.get(s);   // t=离道路中心线的距离+lane_offset，t的参考线与道路中心线的距离即lane_offset
 }
 
 double OpenDriveMap::get_road_length(std::string road_id) const {
