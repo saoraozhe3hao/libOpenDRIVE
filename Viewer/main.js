@@ -194,7 +194,7 @@ function loadOdrMap(clear_map = true, fit_view = true) {
     refline_lines.visible = PARAMS.ref_line;
     refline_lines.matrixAutoUpdate = false;
     disposable_objs.push(reflines_geom);
-    scene.add(refline_lines);   // oasis 道路中的绿线，即s/t坐标的参考线
+    // scene.add(refline_lines);   // oasis 道路中的绿线，即s/t坐标的参考线
 
     /* road network geometry */
     const odr_road_network_mesh = ModuleOpenDrive.get_road_network_mesh(OpenDriveMap, parseFloat(PARAMS.resolution));
@@ -210,6 +210,22 @@ function loadOdrMap(clear_map = true, fit_view = true) {
         for (let i = 0; i < vert_count; i++)
             attr_arr.set(vert_start_idx_encoded, i * 4);
         road_network_geom.attributes.id.array.set(attr_arr, vert_idx_interval[0] * 4);
+
+        /* oasis 给不同类型的车道上不同的颜色 */
+        const road_id = odr_lanes_mesh.get_road_id(vert_start_idx);
+        const lanesec_s0 = odr_lanes_mesh.get_lanesec_s0(vert_start_idx);
+        const lane_id = odr_lanes_mesh.get_lane_id(vert_start_idx);
+        const lane_type = OpenDriveMap.get_lane_type(road_id, lanesec_s0, lane_id);
+        const lane_color_map = {
+            shoulder: 0x467800,
+            border: 0xaaaa1e,
+            driving: 0x7f7f7f,
+            stop: 0xc55a11,
+            median: 0xf5d111,
+            biking: 0x64c8c8,
+            sidewalk: 0x81b2df
+        };
+        applyVertexColors(road_network_geom.attributes.color, new THREE.Color(lane_color_map[lane_type] || 0xffffff), vert_idx_interval[0], vert_count);
     }
     disposable_objs.push(road_network_geom);
 
