@@ -17,6 +17,7 @@ struct OpenDriveMapConfig
     bool with_lateralProfile = true;
     bool with_laneHeight = true;
     bool with_road_objects = true;
+    bool with_road_signals = true;
     bool center_map = true;
     bool abs_z_for_for_local_road_obj_outline = false;
 };
@@ -39,6 +40,9 @@ public:
     double get_road_t(std::string road_id, double s, int lane_id, double offset) const;
     double get_road_length(std::string road_id) const;
     bool has_road_id(std::string road_id) const;
+
+    std::vector<std::string>     get_road_ids() const;
+    std::vector<RoadSignal>      get_road_signals(std::string road_id) const;
 
     RoutingGraph get_routing_graph() const;
 

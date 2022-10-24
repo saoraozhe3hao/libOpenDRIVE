@@ -13,6 +13,7 @@
 #include "Road.h"
 #include "RoadMark.h"
 #include "RoadObject.h"
+#include "RoadSignal.h"
 #include "Utils.hpp"
 
 #include <algorithm>
@@ -542,6 +543,47 @@ OpenDriveMap::OpenDriveMap(const std::string& xodr_file, const OpenDriveMapConfi
                 }
             }
         }
+
+        /* parse road signals */
+        if (config.with_road_signals)
+        {
+            for (pugi::xml_node signal_node : road_node.child("signals").children("signal"))
+            {
+                std::string road_signal_id = signal_node.attribute("id").as_string("");
+                CHECK_AND_REPAIR(road.id_to_signal.find(road_signal_id) == road.id_to_signal.end(),
+                                 (std::string("signal::id already exists - ") + road_signal_id).c_str(),
+                                 road_signal_id = road_signal_id + std::string("_dup"));
+
+                RoadSignal& road_signal = road.id_to_signal
+                                              .insert({road_signal_id,
+                                                       RoadSignal(road_id,
+                                                                  road_signal_id,
+                                                                  signal_node.attribute("s").as_double(0),
+                                                                  signal_node.attribute("t").as_double(0),
+                                                                  signal_node.attribute("zOffset").as_double(0),
+                                                                  signal_node.attribute("value").as_double(0),
+                                                                  signal_node.attribute("height").as_double(0),
+                                                                  signal_node.attribute("width").as_double(0),
+                                                                  signal_node.attribute("hOffset").as_double(0),
+                                                                  signal_node.attribute("pitch").as_double(0),
+                                                                  signal_node.attribute("roll").as_double(0),
+                                                                  signal_node.attribute("name").as_string(""),
+                                                                  signal_node.attribute("dynamic").as_string(""),
+                                                                  signal_node.attribute("orientation").as_string(""),
+                                                                  signal_node.attribute("country").as_string(""),
+                                                                  signal_node.attribute("countryRevision").as_string(""),
+                                                                  signal_node.attribute("type").as_string(""),
+                                                                  signal_node.attribute("subtype").as_string(""),
+                                                                  signal_node.attribute("unit").as_string(""),
+                                                                  signal_node.attribute("text").as_string(""))})
+                                              .first->second;
+                road_signal.xml_node = signal_node;
+
+                CHECK_AND_REPAIR(road_signal.s >= 0, "signal::s < 0", road_signal.s = 0);
+                CHECK_AND_REPAIR(road_signal.height >= 0, "signal::height < 0", road_signal.height = 0);
+                CHECK_AND_REPAIR(road_signal.width >= 0, "signal::width < 0", road_signal.width = 0);
+            }
+        }
     }
 }
 
@@ -611,6 +653,17 @@ double OpenDriveMap::get_road_length(std::string road_id) const {
 
 bool OpenDriveMap::has_road_id(std::string road_id) const {
     return this->id_to_road.find(road_id) != this->id_to_road.end();
+}
+
+std::vector<std::string> OpenDriveMap::get_road_ids() const {
+    std::set<std::string> road_id_set = get_map_keys(this->id_to_road);
+    std::vector<std::string> road_id_vector = {};
+    road_id_vector.assign(road_id_set.begin(), road_id_set.end());
+    return road_id_vector;
+}
+
+std::vector<RoadSignal> OpenDriveMap::get_road_signals(std::string road_id) const {
+    return get_map_values(this->id_to_road.at(road_id).id_to_signal);
 }
 
 std::vector<Junction> OpenDriveMap::get_junctions() const { return get_map_values(this->id_to_junction); }

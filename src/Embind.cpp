@@ -33,6 +33,7 @@ EMSCRIPTEN_BINDINGS(OpenDriveMap)
     emscripten::register_vector<std::vector<Vec3D>>("vector<vector<Vec3D>>");
     emscripten::register_vector<Mesh3D>("vector<Mesh3D>");
     emscripten::register_vector<RoadMark>("vector<RoadMark>");
+    emscripten::register_vector<RoadSignal>("vector<RoadSignal>");
 
     /* maps */
     emscripten::register_map<std::size_t, std::string>("map<std::size_t, string>");
@@ -94,6 +95,7 @@ EMSCRIPTEN_BINDINGS(OpenDriveMap)
         // 属性类型和方法的返回类型，只能是一般数据类型，string/vector<一般类型>
 //        .function("get_roads", &OpenDriveMap::get_roads)
 //        .property("id_to_road", &OpenDriveMap::id_to_road)
+        .function("get_road_ids", &OpenDriveMap::get_road_ids)
         .function("get_xyz", &OpenDriveMap::get_xyz)
         .function("get_section_s0", &OpenDriveMap::get_section_s0)
         .function("get_lane_id", &OpenDriveMap::get_lane_id)
@@ -103,9 +105,16 @@ EMSCRIPTEN_BINDINGS(OpenDriveMap)
         .function("get_road_t", &OpenDriveMap::get_road_t)
         .function("get_road_length", &OpenDriveMap::get_road_length)
         .function("has_road_id", &OpenDriveMap::has_road_id)
+        .function("get_road_signals", &OpenDriveMap::get_road_signals)
         .property("xodr_file", &OpenDriveMap::xodr_file)
         .property("x_offs", &OpenDriveMap::x_offs)
         .property("y_offs", &OpenDriveMap::y_offs);
+
+    emscripten::class_<RoadSignal>("RoadSignal")
+        .property("id", &RoadSignal::id)
+        .property("s", &RoadSignal::s)
+        .property("t", &RoadSignal::t)
+        .property("zOffset", &RoadSignal::zOffset);
 
     emscripten::function("get_road_network_mesh", &get_road_network_mesh);
     emscripten::function("get_refline_segments", &get_refline_segments);

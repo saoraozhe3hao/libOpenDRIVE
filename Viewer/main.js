@@ -184,6 +184,16 @@ function loadOdrMap(clear_map = true, fit_view = true) {
             obj.dispose();
     }
 
+    let roadIds = OpenDriveMap.get_road_ids();
+    for(let i = 0; i < roadIds.size(); i ++){
+        let roadId = roadIds.get(i);
+        let signals = OpenDriveMap.get_road_signals(roadId);
+        for(let i = 0; i < signals.size(); i ++){
+            let signal = signals.get(i);
+            console.log(signal.s);
+        }
+    }
+
     /* reflines */
     const reflines_geom = new THREE.BufferGeometry();
     const odr_refline_segments = ModuleOpenDrive.get_refline_segments(OpenDriveMap, parseFloat(PARAMS.resolution));
@@ -200,7 +210,6 @@ function loadOdrMap(clear_map = true, fit_view = true) {
     const odr_road_network_mesh = ModuleOpenDrive.get_road_network_mesh(OpenDriveMap, parseFloat(PARAMS.resolution));
     const odr_lanes_mesh = odr_road_network_mesh.lanes_mesh;
     const road_network_geom = get_geometry(odr_lanes_mesh);
-    console.log(road_network_geom);
     road_network_geom.attributes.color.array.fill(COLORS.road);
     for (const [vert_start_idx, _] of getStdMapEntries(odr_lanes_mesh.lane_start_indices)) {
         const vert_idx_interval = odr_lanes_mesh.get_idx_interval_lane(vert_start_idx);
@@ -236,7 +245,6 @@ function loadOdrMap(clear_map = true, fit_view = true) {
     road_network_mesh.matrixAutoUpdate = false;
     road_network_mesh.visible = !(PARAMS.view_mode == 'Outlines');
     scene.add(road_network_mesh);
-    console.log(new THREE.Box3().setFromObject(road_network_mesh)); // oasis 路网在webgl中的区域尺寸
 
     /* picking road network mesh */
     const lane_picking_mesh = new THREE.Mesh(road_network_geom, id_material);
@@ -443,9 +451,6 @@ function animate() {
             const lanesec_s0 = odr_lanes_mesh.get_lanesec_s0(INTERSECTED_LANE_ID);
             const lane_id = odr_lanes_mesh.get_lane_id(INTERSECTED_LANE_ID);
             odr_lanes_mesh.delete();
-            const offset = OpenDriveMap.get_lane_offset(road_id, st_pixel_buffer[0], st_pixel_buffer[1]);
-            const t = OpenDriveMap.get_road_t(road_id, st_pixel_buffer[0], lane_id, offset);
-            console.log(offset, t);
             spotlight_info.innerHTML = `
                     <table>
                         <tr><th>road id</th><th>${road_id}</th></tr>
