@@ -42,7 +42,7 @@ public:
     bool has_road_id(std::string road_id) const;
 
     std::vector<std::string>     get_road_ids() const;
-    std::vector<RoadSignal>      get_road_signals(std::string road_id) const;
+    std::vector<RoadSignal>      get_road_signals(std::string road_id, std::string dynamic) const;
 
     RoutingGraph get_routing_graph() const;
 

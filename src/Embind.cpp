@@ -114,7 +114,12 @@ EMSCRIPTEN_BINDINGS(OpenDriveMap)
         .property("id", &RoadSignal::id)
         .property("s", &RoadSignal::s)
         .property("t", &RoadSignal::t)
-        .property("zOffset", &RoadSignal::zOffset);
+        .property("zOffset", &RoadSignal::zOffset)
+        .property("hOffset", &RoadSignal::hOffset)
+        .property("pitch", &RoadSignal::pitch)
+        .property("roll", &RoadSignal::roll)
+        .property("width", &RoadSignal::width)
+        .property("height", &RoadSignal::height);
 
     emscripten::function("get_road_network_mesh", &get_road_network_mesh);
     emscripten::function("get_refline_segments", &get_refline_segments);

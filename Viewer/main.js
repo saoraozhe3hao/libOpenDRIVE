@@ -125,7 +125,7 @@ const roadmarks_material = new THREE.MeshBasicMaterial({
 /* load WASM + odr map */
 libOpenDrive().then(Module => {
     ModuleOpenDrive = Module;
-    fetch("https://guard-strike.oss-cn-shanghai.aliyuncs.com/oasis/xodr/Town03.xodr").then((file_data) => {
+    fetch("https://guard-strike.oss-cn-shanghai.aliyuncs.com/oasis/xodr/Town05.xodr").then((file_data) => {
         file_data.text().then((file_text) => {
             loadFile(file_text, false);
         });
@@ -187,10 +187,10 @@ function loadOdrMap(clear_map = true, fit_view = true) {
     let roadIds = OpenDriveMap.get_road_ids();
     for(let i = 0; i < roadIds.size(); i ++){
         let roadId = roadIds.get(i);
-        let signals = OpenDriveMap.get_road_signals(roadId);
+        let signals = OpenDriveMap.get_road_signals(roadId, 'yes');
         for(let i = 0; i < signals.size(); i ++){
             let signal = signals.get(i);
-            console.log(signal.s);
+            console.log(signal.id);
         }
     }
 
@@ -308,7 +308,7 @@ function loadOdrMap(clear_map = true, fit_view = true) {
     // scene.add(roadmark_outline_lines);  // oasis 车道边框
 
     /* fit view and camera */
-    const bbox_reflines = new THREE.Box3().setFromObject(refline_lines); // oasis 不能传road_network_mesh，否则Town03地图会出错
+    const bbox_reflines = new THREE.Box3().setFromObject(refline_lines);
     const max_diag_dist = bbox_reflines.min.distanceTo(bbox_reflines.max);
     camera.far = max_diag_dist * 1.5;
     // controls.autoRotate = fit_view;

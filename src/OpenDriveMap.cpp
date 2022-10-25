@@ -657,13 +657,17 @@ bool OpenDriveMap::has_road_id(std::string road_id) const {
 
 std::vector<std::string> OpenDriveMap::get_road_ids() const {
     std::set<std::string> road_id_set = get_map_keys(this->id_to_road);
-    std::vector<std::string> road_id_vector = {};
+    std::vector<std::string> road_id_vector;
     road_id_vector.assign(road_id_set.begin(), road_id_set.end());
     return road_id_vector;
 }
 
-std::vector<RoadSignal> OpenDriveMap::get_road_signals(std::string road_id) const {
-    return get_map_values(this->id_to_road.at(road_id).id_to_signal);
+std::vector<RoadSignal> OpenDriveMap::get_road_signals(std::string road_id, std::string dynamic) const {
+    std::vector<RoadSignal> all = get_map_values(this->id_to_road.at(road_id).id_to_signal);
+    std::vector<RoadSignal> signals;
+    std::copy_if(all.begin(), all.end(), std::back_inserter(signals),
+                    [&](const RoadSignal& signal) {return (signal.dynamic==dynamic || dynamic=="");});
+    return signals;
 }
 
 std::vector<Junction> OpenDriveMap::get_junctions() const { return get_map_values(this->id_to_junction); }
