@@ -112,6 +112,7 @@ EMSCRIPTEN_BINDINGS(OpenDriveMap)
 
     emscripten::class_<RoadSignal>("RoadSignal")
         .property("id", &RoadSignal::id)
+        .property("road_id", &RoadSignal::road_id)
         .property("s", &RoadSignal::s)
         .property("t", &RoadSignal::t)
         .property("zOffset", &RoadSignal::zOffset)
