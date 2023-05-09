@@ -360,7 +360,7 @@ OpenDriveMap::OpenDriveMap(const std::string& xodr_file, const OpenDriveMapConfi
                         for (pugi::xml_node lane_speed_node : lane_node.children("speed"))
                         {
                             double s_offset = lane_speed_node.attribute("sOffset").as_double(0.0);
-                            std::string max = lane_speed_node.attribute("max").as_string("");
+                            double max = lane_speed_node.attribute("max").as_double(0.0);
                             std::string unit = lane_speed_node.attribute("unit").as_string("");
                             lane.s_to_speed.insert({s0 + s_offset, LaneSpeed(s0 + s_offset, max, unit)});
                         }

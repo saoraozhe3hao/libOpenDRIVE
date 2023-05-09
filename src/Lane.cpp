@@ -13,7 +13,7 @@ LaneKey::LaneKey(std::string road_id, double lanesection_s0, int lane_id) : road
 
 std::string LaneKey::to_string() const { return string_format("%s/%f/%d", this->road_id.c_str(), this->lanesection_s0, this->lane_id); }
 
-LaneSpeed::LaneSpeed(double s, std::string max, std::string unit) : s(s), max(max), unit(unit) {}
+LaneSpeed::LaneSpeed(double s, double max, std::string unit) : s(s), max(max), unit(unit) {}
 
 Lane::Lane(std::string road_id, double lanesection_s0, int id, bool level, std::string type) :
     key(road_id, lanesection_s0, id), id(id), level(level), type(type)

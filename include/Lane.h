@@ -34,10 +34,10 @@ struct LaneKey
 
 struct LaneSpeed
 {
-    LaneSpeed(double s, std::string max, std::string unit);
+    LaneSpeed(double s, double max, std::string unit);
 
     double s = 0;
-    std::string max = "";
+    double max = 0;
     std::string unit = "";
 };
 
