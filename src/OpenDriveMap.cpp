@@ -355,6 +355,18 @@ OpenDriveMap::OpenDriveMap(const std::string& xodr_file, const OpenDriveMapConfi
                     }
                 }
 
+                if (config.with_lane_speeds)
+                    {
+                        for (pugi::xml_node lane_speed_node : lane_node.children("speed"))
+                        {
+                            double s_offset = lane_speed_node.attribute("sOffset").as_double(0.0);
+                            std::string max = lane_speed_node.attribute("max").as_string("");
+                            std::string unit = lane_speed_node.attribute("unit").as_string("");
+                            lane.s_to_speed.insert({s0 + s_offset, LaneSpeed(s0 + s_offset, max, unit)});
+                        }
+                    }
+
+
                 for (pugi::xml_node roadmark_node : lane_node.children("roadMark"))
                 {
                     RoadMarkGroup roadmark_group(road_id,
@@ -672,6 +684,13 @@ std::vector<RoadSignal> OpenDriveMap::get_road_signals(std::string road_id, std:
 
 std::vector<SpeedRecord> OpenDriveMap::get_road_speeds(std::string road_id) const {
     return get_map_values(this->id_to_road.at(road_id).s_to_speed);
+}
+
+std::vector<LaneSpeed> OpenDriveMap::get_lane_speeds(std::string road_id, double s, int lane_id) const {
+    Road road = this->id_to_road.at(road_id);
+    LaneSection section = road.get_lanesection(s);
+    Lane lane = section.id_to_lane.at(lane_id);
+    return get_map_values(lane.s_to_speed);
 }
 
 std::vector<Junction> OpenDriveMap::get_junctions() const { return get_map_values(this->id_to_junction); }

@@ -18,6 +18,7 @@ struct OpenDriveMapConfig
     bool with_laneHeight = true;
     bool with_road_objects = true;
     bool with_road_signals = true;
+    bool with_lane_speeds = true;
     bool center_map = true;
     bool abs_z_for_for_local_road_obj_outline = false;
 };
@@ -44,6 +45,7 @@ public:
     std::vector<std::string>     get_road_ids() const;
     std::vector<RoadSignal>      get_road_signals(std::string road_id, std::string dynamic) const;
     std::vector<SpeedRecord>     get_road_speeds(std::string road_id) const;
+    std::vector<LaneSpeed>       get_lane_speeds(std::string road_id, double s, int lane_id) const;
 
     RoutingGraph get_routing_graph() const;
 

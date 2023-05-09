@@ -32,6 +32,15 @@ struct LaneKey
     int         lane_id = 0;
 };
 
+struct LaneSpeed
+{
+    LaneSpeed(double s, std::string max, std::string unit);
+
+    double s = 0;
+    std::string max = "";
+    std::string unit = "";
+};
+
 struct Lane : public XmlNode
 {
     Lane(std::string road_id, double lanesection_s0, int id, bool level, std::string type);
@@ -50,6 +59,7 @@ struct Lane : public XmlNode
     CubicSpline inner_border;
 
     std::map<double, HeightOffset> s_to_height_offset;
+    std::map<double, LaneSpeed>    s_to_speed;
     std::set<RoadMarkGroup>        roadmark_groups;
 };
 

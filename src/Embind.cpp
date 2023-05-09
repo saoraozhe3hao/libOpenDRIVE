@@ -35,6 +35,7 @@ EMSCRIPTEN_BINDINGS(OpenDriveMap)
     emscripten::register_vector<RoadMark>("vector<RoadMark>");
     emscripten::register_vector<RoadSignal>("vector<RoadSignal>");
     emscripten::register_vector<SpeedRecord>("vector<SpeedRecord>");
+    emscripten::register_vector<LaneSpeed>("vector<LaneSpeed>");
 
     /* maps */
     emscripten::register_map<std::size_t, std::string>("map<std::size_t, string>");
@@ -108,6 +109,7 @@ EMSCRIPTEN_BINDINGS(OpenDriveMap)
         .function("has_road_id", &OpenDriveMap::has_road_id)
         .function("get_road_signals", &OpenDriveMap::get_road_signals)
         .function("get_road_speeds", &OpenDriveMap::get_road_speeds)
+        .function("get_lane_speeds", &OpenDriveMap::get_lane_speeds)
         .property("xodr_file", &OpenDriveMap::xodr_file)
         .property("x_offs", &OpenDriveMap::x_offs)
         .property("y_offs", &OpenDriveMap::y_offs);
@@ -128,6 +130,11 @@ EMSCRIPTEN_BINDINGS(OpenDriveMap)
         .property("s", &SpeedRecord::s)
         .property("max", &SpeedRecord::max)
         .property("unit", &SpeedRecord::unit);
+
+    emscripten::class_<LaneSpeed>("LaneSpeed")
+        .property("s", &LaneSpeed::s)
+        .property("max", &LaneSpeed::max)
+        .property("unit", &LaneSpeed::unit);
 
     emscripten::function("get_road_network_mesh", &get_road_network_mesh);
     emscripten::function("get_refline_segments", &get_refline_segments);

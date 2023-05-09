@@ -47,7 +47,7 @@ RoadLink::RoadLink(std::string id, Type type, ContactPoint contact_point) : id(i
 
 RoadNeighbor::RoadNeighbor(std::string id, std::string side, std::string direction) : id(id), side(side), direction(direction) {}
 
-SpeedRecord::SpeedRecord(double s, std::string max, std::string unit) : max(max), unit(unit) {}
+SpeedRecord::SpeedRecord(double s, std::string max, std::string unit) : s(s), max(max), unit(unit) {}
 
 std::vector<LaneSection> Road::get_lanesections() const { return get_map_values(this->s_to_lanesection); }
 
