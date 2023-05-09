@@ -43,6 +43,7 @@ public:
 
     std::vector<std::string>     get_road_ids() const;
     std::vector<RoadSignal>      get_road_signals(std::string road_id, std::string dynamic) const;
+    std::vector<SpeedRecord>     get_road_speeds(std::string road_id) const;
 
     RoutingGraph get_routing_graph() const;
 

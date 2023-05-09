@@ -70,8 +70,9 @@ struct RoadNeighbor : public XmlNode
 
 struct SpeedRecord : public XmlNode
 {
-    SpeedRecord(std::string max, std::string unit);
+    SpeedRecord(double s, std::string max, std::string unit);
 
+    double s = 0;
     std::string max = "";
     std::string unit = "";
 };

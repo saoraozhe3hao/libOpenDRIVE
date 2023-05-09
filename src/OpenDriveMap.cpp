@@ -182,7 +182,7 @@ OpenDriveMap::OpenDriveMap(const std::string& xodr_file, const OpenDriveMapConfi
             {
                 const std::string speed_record_max = node.attribute("max").as_string("");
                 const std::string speed_record_unit = node.attribute("unit").as_string("");
-                SpeedRecord       speed_record(speed_record_max, speed_record_unit);
+                SpeedRecord       speed_record(s, speed_record_max, speed_record_unit);
                 speed_record.xml_node = node;
                 road.s_to_speed.insert({s, speed_record});
             }
@@ -668,6 +668,10 @@ std::vector<RoadSignal> OpenDriveMap::get_road_signals(std::string road_id, std:
     std::copy_if(all.begin(), all.end(), std::back_inserter(signals),
                     [&](const RoadSignal& signal) {return (signal.dynamic==dynamic || dynamic=="");});
     return signals;
+}
+
+std::vector<SpeedRecord> OpenDriveMap::get_road_speeds(std::string road_id) const {
+    return get_map_values(this->id_to_road.at(road_id).s_to_speed);
 }
 
 std::vector<Junction> OpenDriveMap::get_junctions() const { return get_map_values(this->id_to_junction); }
