@@ -34,6 +34,7 @@ EMSCRIPTEN_BINDINGS(OpenDriveMap)
     emscripten::register_vector<Mesh3D>("vector<Mesh3D>");
     emscripten::register_vector<RoadMark>("vector<RoadMark>");
     emscripten::register_vector<RoadSignal>("vector<RoadSignal>");
+    emscripten::register_vector<RoadObject>("vector<RoadObject>");
     emscripten::register_vector<SpeedRecord>("vector<SpeedRecord>");
     emscripten::register_vector<LaneSpeed>("vector<LaneSpeed>");
 
@@ -108,6 +109,7 @@ EMSCRIPTEN_BINDINGS(OpenDriveMap)
         .function("get_road_length", &OpenDriveMap::get_road_length)
         .function("has_road_id", &OpenDriveMap::has_road_id)
         .function("get_road_signals", &OpenDriveMap::get_road_signals)
+        .function("get_road_objects", &OpenDriveMap::get_road_objects)
         .function("get_road_speeds", &OpenDriveMap::get_road_speeds)
         .function("get_lane_speeds", &OpenDriveMap::get_lane_speeds)
         .property("xodr_file", &OpenDriveMap::xodr_file)
@@ -125,6 +127,24 @@ EMSCRIPTEN_BINDINGS(OpenDriveMap)
         .property("roll", &RoadSignal::roll)
         .property("width", &RoadSignal::width)
         .property("height", &RoadSignal::height);
+
+    emscripten::class_<RoadObject>("RoadObject")
+        .property("id", &RoadObject::id)
+        .property("name", &RoadObject::name)
+        .property("type", &RoadObject::type)
+        .property("road_id", &RoadObject::road_id)
+        .property("s0", &RoadObject::s0)
+        .property("t0", &RoadObject::t0)
+        .property("z0", &RoadObject::z0)
+        .property("length", &RoadObject::length)
+        .property("valid_length", &RoadObject::valid_length)
+        .property("orientation", &RoadObject::orientation)
+        .property("hdg", &RoadObject::hdg)
+        .property("pitch", &RoadObject::pitch)
+        .property("roll", &RoadObject::roll)
+        .property("width", &RoadObject::width)
+        .property("height", &RoadObject::height)
+        .property("radius", &RoadObject::radius);
 
     emscripten::class_<SpeedRecord>("SpeedRecord")
         .property("s", &SpeedRecord::s)

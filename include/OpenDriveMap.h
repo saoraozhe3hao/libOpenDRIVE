@@ -44,6 +44,7 @@ public:
 
     std::vector<std::string>     get_road_ids() const;
     std::vector<RoadSignal>      get_road_signals(std::string road_id, std::string dynamic) const;
+    std::vector<RoadObject>      get_road_objects(std::string road_id, std::string type) const;
     std::vector<SpeedRecord>     get_road_speeds(std::string road_id) const;
     std::vector<LaneSpeed>       get_lane_speeds(std::string road_id, double s, int lane_id) const;
 

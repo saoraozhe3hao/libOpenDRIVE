@@ -54,7 +54,7 @@ Install [emsdk](https://github.com/emscripten-core/emsdk) and run the following 
 
 ```bash
 source /root/emsdk/emsdk_env.sh  # 每启一次shell，使用emcmake之前，都得执行一次
-rm -rf build;mkdir build && cd build;emcmake cmake ..;emmake make
+rm -rf build;mkdir build && cd build;emcmake cmake ..;emmake make;cd ../
 ```
 
 This will create the files _ModuleOpenDrive.js/.wasm_. To run the viewer copy them to the _Viewer/_ directory.
@@ -71,4 +71,5 @@ odr_map = new Module.OpenDriveMap("./data.xodr", odr_map_config);
 
 
 ### 二次开发
+本项目基于 libOpendrive v0.3.0
 在 Embind.cpp 配置需要暴露的方法和属性

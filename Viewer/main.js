@@ -149,7 +149,7 @@ function loadFile(file_text, clear_map) {
     odr_map_config = {
         with_lateralProfile: PARAMS.lateralProfile,
         with_laneHeight: PARAMS.laneHeight,
-        with_road_objects: false,
+        with_road_objects: true,
         center_map: true,
         abs_z_for_for_local_road_obj_outline: true
     };
@@ -163,7 +163,7 @@ function reloadOdrMap() {
     odr_map_config = {
         with_lateralProfile: PARAMS.lateralProfile,
         with_laneHeight: PARAMS.laneHeight,
-        with_road_objects: false,
+        with_road_objects: true,
         center_map: true,
         abs_z_for_for_local_road_obj_outline: true
     };
@@ -190,7 +190,14 @@ function loadOdrMap(clear_map = true, fit_view = true) {
         let signals = OpenDriveMap.get_road_signals(roadId, 'yes');
         for(let i = 0; i < signals.size(); i ++){
             let signal = signals.get(i);
-            console.log(signal.id);
+            // console.log(signal.id);
+        }
+
+        let parkingSpaces = OpenDriveMap.get_road_objects(roadId, 'parkingSpace');
+
+        for(let i = 0; i < parkingSpaces.size(); i ++){
+            let parkingSpace = parkingSpaces.get(i);
+            console.log(parkingSpace.id);
         }
     }
 

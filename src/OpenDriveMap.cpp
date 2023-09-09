@@ -675,11 +675,19 @@ std::vector<std::string> OpenDriveMap::get_road_ids() const {
 }
 
 std::vector<RoadSignal> OpenDriveMap::get_road_signals(std::string road_id, std::string dynamic) const {
-    std::vector<RoadSignal> all = get_map_values(this->id_to_road.at(road_id).id_to_signal);
+    std::vector<RoadSignal> all = this->id_to_road.at(road_id).get_road_signals();
     std::vector<RoadSignal> signals;
     std::copy_if(all.begin(), all.end(), std::back_inserter(signals),
                     [&](const RoadSignal& signal) {return (signal.dynamic==dynamic || dynamic=="");});
     return signals;
+}
+
+std::vector<RoadObject> OpenDriveMap::get_road_objects(std::string road_id, std::string type) const {
+    std::vector<RoadObject> all = this->id_to_road.at(road_id).get_road_objects();
+    std::vector<RoadObject> objects;
+    std::copy_if(all.begin(), all.end(), std::back_inserter(objects),
+                    [&](const RoadObject& object) {return (object.type==type || type=="");});
+    return objects;
 }
 
 std::vector<SpeedRecord> OpenDriveMap::get_road_speeds(std::string road_id) const {
