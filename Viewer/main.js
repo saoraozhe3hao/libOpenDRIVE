@@ -150,6 +150,7 @@ function loadFile(file_text, clear_map) {
         with_lateralProfile: PARAMS.lateralProfile,
         with_laneHeight: PARAMS.laneHeight,
         with_road_objects: true,
+        with_road_signals: true,
         center_map: true,
         abs_z_for_for_local_road_obj_outline: true
     };
@@ -164,6 +165,7 @@ function reloadOdrMap() {
         with_lateralProfile: PARAMS.lateralProfile,
         with_laneHeight: PARAMS.laneHeight,
         with_road_objects: true,
+        with_road_signals: true,
         center_map: true,
         abs_z_for_for_local_road_obj_outline: true
     };

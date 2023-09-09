@@ -90,6 +90,7 @@ EMSCRIPTEN_BINDINGS(OpenDriveMap)
         .field("with_lateralProfile", &OpenDriveMapConfig::with_lateralProfile)
         .field("with_laneHeight", &OpenDriveMapConfig::with_laneHeight)
         .field("with_road_objects", &OpenDriveMapConfig::with_road_objects)
+        .field("with_road_signals", &OpenDriveMapConfig::with_road_signals)
         .field("center_map", &OpenDriveMapConfig::center_map)
         .field("abs_z_for_for_local_road_obj_outline", &OpenDriveMapConfig::abs_z_for_for_local_road_obj_outline);
 
